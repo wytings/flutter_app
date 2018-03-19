@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(new MyApp());
@@ -44,6 +45,8 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  int index = 0;
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void _incrementCounter() {
     setState(() {
@@ -56,6 +59,26 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  void _showSnackbar(String msg) {
+    _scaffoldKey.currentState.showSnackBar(
+        new SnackBar(content: new Text(msg)));
+  }
+
+  void _showDialog() {
+    showDialog(context: context,
+        child: new CupertinoAlertDialog(title: new Text('title'),
+          content: new Text('content'),
+          actions: <Widget>[new CupertinoDialogAction(onPressed: () {
+           Navigator.pop(context,1);
+          },
+              child: new Text(
+                  'Confirm', textAlign: TextAlign.center, style: Theme
+                  .of(context)
+                  .textTheme
+                  .title))
+          ],));
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -65,11 +88,31 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new Scaffold(
+      key: _scaffoldKey,
       appBar: new AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: new Text(widget.title),
       ),
+      bottomNavigationBar: new BottomNavigationBar(items: [
+        new BottomNavigationBarItem(
+            icon: new Icon(Icons.add),
+            title: new Text("first"))
+        ,
+        new BottomNavigationBarItem(
+            icon: new Icon(Icons.dashboard),
+            title: new Text("second"))
+        ,
+        new BottomNavigationBarItem(
+            icon: new Icon(Icons.satellite),
+            title: new Text("second"))
+      ],
+          currentIndex: index,
+          onTap: (i) {
+            setState(() {
+              this.index = i;
+            });
+          }),
       body: new Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
@@ -94,14 +137,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             new Text(
               '$_counter',
-              style: Theme.of(context).textTheme.display1,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .display1,
             ),
           ],
         ),
       ),
       floatingActionButton: new FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
+        onPressed: () {
+          _showDialog();
+        },
         child: new Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
