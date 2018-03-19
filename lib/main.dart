@@ -66,10 +66,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _showDialog() {
     showDialog(context: context,
+        barrierDismissible: false,
         child: new CupertinoAlertDialog(title: new Text('title'),
           content: new Text('content'),
           actions: <Widget>[new CupertinoDialogAction(onPressed: () {
-           Navigator.pop(context,1);
+            Navigator.pop(context, 1);
           },
               child: new Text(
                   'Confirm', textAlign: TextAlign.center, style: Theme
@@ -77,6 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
                   .textTheme
                   .title))
           ],));
+  }
+
+  void _showAndroidDialog() {
+    showDialog(context: context,
+        barrierDismissible: false,
+        child: new AlertDialog(
+          title: new Text("My Super title"),
+          content: new Text("Hello World"),
+        )
+    );
   }
 
   @override
