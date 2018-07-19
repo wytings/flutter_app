@@ -7,103 +7,106 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("int My App build context = $context");
-    return MaterialApp(
-      theme: ThemeData(primarySwatch: Colors.deepPurple),
-      home: RandomWords(),
-    );
-  }
-}
 
-class RandomWords extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    print("in RandomWords createState");
-    return RandomState();
-  }
-}
-
-class RandomState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = Set<WordPair>();
-
-  @override
-  Widget build(BuildContext context) {
-    print("in RandomState build context = $context");
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Startup Name Generator'),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.list),
-            onPressed: _pushFavorites,
-          )
+    Widget titleSection = Container(
+      padding: const EdgeInsets.all(32.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(
+                    'Oeschinen Lake Campground',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Text(
+                  'Kandersteg, Switzerland',
+                  style: TextStyle(
+                    color: Colors.grey[500],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            Icons.star,
+            color: Colors.red[500],
+          ),
+          Text('41'),
         ],
       ),
-      body: _buildList(),
     );
-  }
 
-  void _pushFavorites() {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      final titles = _saved.map((pair) {
-        return ListTile(
-          title: Text(pair.asPascalCase),
-        );
-      });
+    Column buildButtonColumn(IconData icon, String label) {
+      Color color = Theme.of(context).primaryColor;
 
-      final divided = ListTile
-          .divideTiles(
-            context: context,
-            tiles: titles,
-          )
-          .toList();
+      return Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: color),
+          Container(
+            margin: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12.0,
+                fontWeight: FontWeight.w400,
+                color: color,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
 
-      return Scaffold(
+    Widget buttonSection = Container(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          buildButtonColumn(Icons.call, 'CALL'),
+          buildButtonColumn(Icons.near_me, 'ROUTE'),
+          buildButtonColumn(Icons.share, 'SHARE'),
+        ],
+      ),
+    );
+
+    Widget textSection = Container(
+      padding: const EdgeInsets.all(32.0),
+      child: Text(
+        '''
+Lake Oeschinen lies at the foot of the Blüemlisalp in the Bernese Alps. Situated 1,578 meters above sea level, it is one of the larger Alpine Lakes. A gondola ride from Kandersteg, followed by a half-hour walk through pastures and pine forest, leads you to the lake, which warms to 20 degrees Celsius in the summer. Activities enjoyed here include rowing, and riding the summer toboggan run.
+        ''',
+        softWrap: true,
+      ),
+    );
+
+    return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
+      home: Scaffold(
         appBar: AppBar(
-          title: Text("Favorite Words"),
+          title: Text("Top Lakes"),
         ),
         body: ListView(
-          children: divided,
+          children: <Widget>[
+            Image.asset(
+              'images/lake.jpg',
+              width: 600.0,
+              height: 240.0,
+              fit: BoxFit.cover,
+            ),
+            titleSection,
+            buttonSection,
+            textSection,
+          ],
         ),
-      );
-    }));
-  }
-
-  Widget _buildList() {
-    print("in _buildList");
-    return ListView.builder(itemBuilder: (context, i) {
-      print("in itemBuilder");
-      if (i.isOdd) {
-        return Divider(
-          height: 1.0,
-        );
-      }
-      final index = i ~/ 2;
-      if (index >= _suggestions.length) {
-        _suggestions.addAll(generateWordPairs().take(10));
-      }
-      return _buildRow(index);
-    });
-  }
-
-  Widget _buildRow(int index) {
-    final wordPair = _suggestions[index];
-    final alreadySaved = _saved.contains(wordPair);
-    return ListTile(
-      title: Text("$index-${wordPair.asPascalCase}"),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,
-        color: alreadySaved ? Colors.red : null,
       ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(wordPair);
-          } else {
-            _saved.add(wordPair);
-          }
-        });
-      },
     );
   }
 }
