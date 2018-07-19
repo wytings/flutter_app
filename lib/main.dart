@@ -6,7 +6,9 @@ void main() => runApp(new MyApp());
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print("int My App build context = $context");
     return MaterialApp(
+      theme: ThemeData(primarySwatch: Colors.deepPurple),
       home: RandomWords(),
     );
   }
@@ -15,6 +17,7 @@ class MyApp extends StatelessWidget {
 class RandomWords extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
+    print("in RandomWords createState");
     return RandomState();
   }
 }
@@ -25,18 +28,55 @@ class RandomState extends State<RandomWords> {
 
   @override
   Widget build(BuildContext context) {
+    print("in RandomState build context = $context");
     return Scaffold(
       appBar: AppBar(
         title: Text('Startup Name Generator'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.list),
+            onPressed: _pushFavorites,
+          )
+        ],
       ),
       body: _buildList(),
     );
   }
 
+  void _pushFavorites() {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+      final titles = _saved.map((pair) {
+        return ListTile(
+          title: Text(pair.asPascalCase),
+        );
+      });
+
+      final divided = ListTile
+          .divideTiles(
+            context: context,
+            tiles: titles,
+          )
+          .toList();
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text("Favorite Words"),
+        ),
+        body: ListView(
+          children: divided,
+        ),
+      );
+    }));
+  }
+
   Widget _buildList() {
+    print("in _buildList");
     return ListView.builder(itemBuilder: (context, i) {
+      print("in itemBuilder");
       if (i.isOdd) {
-        return Divider();
+        return Divider(
+          height: 1.0,
+        );
       }
       final index = i ~/ 2;
       if (index >= _suggestions.length) {
@@ -47,8 +87,23 @@ class RandomState extends State<RandomWords> {
   }
 
   Widget _buildRow(int index) {
+    final wordPair = _suggestions[index];
+    final alreadySaved = _saved.contains(wordPair);
     return ListTile(
-      title: Text("$index-${_suggestions[index].asPascalCase}"),
+      title: Text("$index-${wordPair.asPascalCase}"),
+      trailing: Icon(
+        alreadySaved ? Icons.favorite : Icons.favorite_border,
+        color: alreadySaved ? Colors.red : null,
+      ),
+      onTap: () {
+        setState(() {
+          if (alreadySaved) {
+            _saved.remove(wordPair);
+          } else {
+            _saved.add(wordPair);
+          }
+        });
+      },
     );
   }
 }
